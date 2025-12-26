@@ -1,12 +1,41 @@
 import streamlit as st
 
-# Define the pages
-main_page = st.Page("pages/main_page.py", title="Main Page", icon="🎈")
-page_2 = st.Page("pages/page_2.py", title="Page 2", icon="❄️")
-page_3 = st.Page("pages/page_3.py", title="Page 3", icon="🎉")
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
-# Set up navigation
-pg = st.navigation([main_page, page_2, page_3])
+def login():
+    if st.button("Log in"):
+        st.session_state.logged_in = True
+        st.rerun()
 
-# Run the selected page
+def logout():
+    if st.button("Log out"):
+        st.session_state.logged_in = False
+        st.rerun()
+
+login_page = st.Page(login, title="Log in", icon=":material/login:")
+logout_page = st.Page(logout, title="Log out", icon=":material/logout:")
+
+dashboard = st.Page(
+    "reports/dashboard.py", title="Dashboard", icon=":material/dashboard:", default=True
+)
+bugs = st.Page("reports/bugs.py", title="Bug reports", icon=":material/bug_report:")
+alerts = st.Page(
+    "reports/alerts.py", title="System alerts", icon=":material/notification_important:"
+)
+
+search = st.Page("tools/search.py", title="Search", icon=":material/search:")
+history = st.Page("tools/history.py", title="History", icon=":material/history:")
+
+if st.session_state.logged_in:
+    pg = st.navigation(
+        {
+            "Account": [logout_page],
+            "Reports": [dashboard, bugs, alerts],
+            "Tools": [search, history],
+        }
+    )
+else:
+    pg = st.navigation([login_page])
+
 pg.run()
